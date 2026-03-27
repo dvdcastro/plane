@@ -66,6 +66,13 @@ class IssueSerializer(BaseSerializer):
         source="type", queryset=IssueType.objects.all(), required=False, allow_null=True
     )
 
+    # Allow callers to pass either `state` or `state_id` (both resolve to the
+    # same FK).  Without this alias, PATCH requests that send `state_id` were
+    # silently ignored because DRF only recognised the bare `state` field name.
+    state_id = serializers.PrimaryKeyRelatedField(
+        source="state", queryset=State.objects.all(), required=False, allow_null=True, write_only=True
+    )
+
     class Meta:
         model = Issue
         read_only_fields = ["id", "workspace", "project", "updated_by", "updated_at"]
